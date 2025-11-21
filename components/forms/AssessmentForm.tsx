@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import Slider from "@/components/ui/Slider";
 import SettingsModal from "@/components/settings/SettingsModal";
 import { Save, RotateCcw, Settings } from "lucide-react";
@@ -59,7 +60,7 @@ export default function AssessmentForm({
 
   const handleSubmit = async () => {
     if (!name.trim()) {
-      alert("Please enter an assessment name");
+      toast.error("Please enter an assessment name");
       return;
     }
 
@@ -72,14 +73,15 @@ export default function AssessmentForm({
       });
 
       if (res.ok) {
+        toast.success("Assessment saved successfully!");
         handleReset();
         onAssessmentAdded();
       } else {
-        alert("Failed to save assessment");
+        toast.error("Failed to save assessment");
       }
     } catch (error) {
       console.error("Error saving assessment:", error);
-      alert("Error saving assessment");
+      toast.error("Error saving assessment");
     } finally {
       setLoading(false);
     }

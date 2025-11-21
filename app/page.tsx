@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import RadarChart from "@/components/charts/RadarChart";
 import AssessmentForm from "@/components/forms/AssessmentForm";
 import HistoryList from "@/components/history/HistoryList";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { ChartSkeleton, HistoryListSkeleton, FormSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ChartData } from "chart.js";
 
 interface Assessment {
@@ -23,6 +25,8 @@ export default function Dashboard() {
   const [categories, setCategories] = useState<string[]>([]);
   const [draftScores, setDraftScores] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [assessmentToDelete, setAssessmentToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -65,10 +69,15 @@ export default function Dashboard() {
   };
 
   const handleDeleteAssessment = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this assessment?")) return;
+    setAssessmentToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!assessmentToDelete) return;
 
     try {
-      const res = await fetch(`/api/assessments?id=${id}`, {
+      const res = await fetch(`/api/assessments?id=${assessmentToDelete}`, {
         method: "DELETE",
       });
       fetchData();
@@ -163,8 +172,20 @@ export default function Dashboard() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
+          <div className="glass-panel p-6">
+            <div className="h-7 w-32 bg-slate-700 rounded mb-4 animate-pulse" />
+            <ChartSkeleton />
+          </div>
+          <div className="h-[400px] glass-panel p-6">
+            <div className="h-7 w-24 bg-slate-700 rounded mb-4 animate-pulse" />
+            <HistoryListSkeleton />
+          </div>
+        </div>
+        <div className="lg:col-span-1">
+          <FormSkeleton />
+        </div>
       </div>
     );
   }
@@ -204,6 +225,17 @@ export default function Dashboard() {
           onScoresChange={setDraftScores}
         />
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Assessment"
+        message="Are you sure you want to delete this assessment? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

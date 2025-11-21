@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ export default function SettingsModal({
 
   const handleRemoveCategory = (index: number) => {
     if (categories.length <= 3) {
-      alert("You must have at least 3 categories.");
+      toast.error("You must have at least 3 categories.");
       return;
     }
     const newCategories = [...categories];
@@ -65,14 +66,15 @@ export default function SettingsModal({
       });
 
       if (res.ok) {
+        toast.success("Categories saved successfully!");
         onCategoriesUpdated();
         onClose();
       } else {
-        alert("Failed to save categories");
+        toast.error("Failed to save categories");
       }
     } catch (error) {
       console.error("Error saving categories:", error);
-      alert("Error saving categories");
+      toast.error("Error saving categories");
     } finally {
       setLoading(false);
     }
@@ -184,12 +186,12 @@ export default function SettingsModal({
                         }
                       }
                       
-                      alert("Import successful!");
+                      toast.success("Import successful!");
                       onCategoriesUpdated();
                       onClose();
                     } catch (e) {
                       console.error(e);
-                      alert("Invalid JSON data");
+                      toast.error("Invalid JSON data");
                     } finally {
                       setLoading(false);
                     }

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Trash2, Calendar } from "lucide-react";
+import { Trash2, Calendar, FileSearch } from "lucide-react";
 import { cn } from "@/lib/utils";
+import EmptyState from "@/components/ui/EmptyState";
 
 interface Assessment {
   _id: string;
@@ -45,9 +46,11 @@ export default function HistoryList({
       
       <div className="overflow-y-auto flex-1 pr-2 space-y-3 custom-scrollbar">
         {assessments.length === 0 ? (
-          <div className="text-center text-slate-500 py-8">
-            No assessments yet.
-          </div>
+          <EmptyState
+            icon={FileSearch}
+            title="No assessments yet"
+            description="Create your first assessment to start tracking your skill growth over time."
+          />
         ) : (
           assessments.map((assessment) => (
             <div
