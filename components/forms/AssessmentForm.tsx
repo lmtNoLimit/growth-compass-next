@@ -27,21 +27,25 @@ export default function AssessmentForm({
   useEffect(() => {
     setScores(prev => {
       const newScores = { ...prev };
+      let changed = false;
       categories.forEach((cat) => {
         if (newScores[cat] === undefined) {
           newScores[cat] = 5;
+          changed = true;
         }
       });
-      // Notify parent of initial scores
-      onScoresChange(newScores);
-      return newScores;
+      return changed ? newScores : prev;
     });
-  }, [categories, onScoresChange]);
+  }, [categories]);
+
+  // Sync scores with parent whenever they change
+  useEffect(() => {
+    onScoresChange(scores);
+  }, [scores, onScoresChange]);
 
   const handleScoreChange = (category: string, value: number) => {
     const newScores = { ...scores, [category]: value };
     setScores(newScores);
-    onScoresChange(newScores);
   };
 
   const handleReset = () => {
@@ -50,7 +54,6 @@ export default function AssessmentForm({
       resetScores[cat] = 5;
     });
     setScores(resetScores);
-    onScoresChange(resetScores);
     setName("");
   };
 
